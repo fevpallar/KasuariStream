@@ -16,10 +16,14 @@ import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.util.Size;
-
+/*==============================================
+Note : Kelas cadangan untuk migrasi ke Camera API v2.
+sekarang msh pake config untuk camera api yg lama
+Karena porting Camera API 2 ke struktur yg sudah ada sungguh ,aduhai, bohay, sulit...
+============================================== */
 public class CameraInspector {
     private Activity activity;
-    private CameraManager cameraManager;
+    private static CameraManager cameraManager;
 
     // Cari element size yg paling besar
     /*==================================
@@ -30,7 +34,7 @@ public class CameraInspector {
      capai 1080 px , malah error
      sementara masih ukuran 640 x 480 untuk keperluan testing,,,,
      ====================================*/
-    private Size getIndexDariMaximumElementSize(Size size[]) {
+    private static Size getIndexDariMaximumElementSize(Size size[]) {
         int max = 0;
         Size targetSize = null;
         for (Size sz : size) {
@@ -53,14 +57,14 @@ public class CameraInspector {
 
 
 
-    public  void prepareCameraSetting(Handler backgroundHandler) throws CameraAccessException {
+    public  static void prepareCameraSetting() throws CameraAccessException {
         /*==========================
          Kamera depan dulu. Besok2 klo ada waktu baru extend ke belakang..
          =============================*/
         String listCameraId[] = getListCameraID();
 
         for (String id : listCameraId) {
-            CameraCharacteristics cameraCharacs = this.cameraManager.getCameraCharacteristics(id);
+            CameraCharacteristics cameraCharacs = cameraManager.getCameraCharacteristics(id);
             if (cameraCharacs.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_FRONT) {
                 StreamConfigurationMap mapKonfigStream = cameraCharacs.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 if (mapKonfigStream != null) {
@@ -76,7 +80,7 @@ public class CameraInspector {
 
                     imageReader = ImageReader.newInstance(preview.getWidth(), preview.getHeight(), ImageFormat.JPEG, 1);
 
-                    imageReader.setOnImageAvailableListener(
+                /*    imageReader.setOnImageAvailableListener(
                             new ImageReader.OnImageAvailableListener() {
                                 @Override
                                 public void onImageAvailable(ImageReader imageReader) {
@@ -84,13 +88,13 @@ public class CameraInspector {
                                 }
                             },
                            backgroundHandler
-                    );
+                    );*/
                 }
                 cameraId = id;
             }
         }
     } // ends Iterate camera
-    private String[] getListCameraID() throws CameraAccessException {
+    private static String[] getListCameraID() throws CameraAccessException {
         return cameraManager.getCameraIdList();
     }
 
@@ -114,8 +118,9 @@ public class CameraInspector {
         return cameraManager;
     }
 
-    private ImageReader imageReader;
-    private String cameraId = "";
-    private Size preview, videoSize;
+    private static ImageReader imageReader;
+    private static String cameraId = "";
+    private static Size preview;
+    private static Size videoSize;
 
 }

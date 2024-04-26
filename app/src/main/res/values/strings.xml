@@ -1,3 +1,4 @@
 <resources>
-
+    <string name="recordingOn">Start recording</string>
+    <string name="recordingOff">Stop recording</string>
 </resources>
